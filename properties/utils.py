@@ -36,11 +36,8 @@ def get_redis_cache_metrics():
     keyspace_misses = info.get('keyspace_misses', 0)
 
     total_requests = keyspace_hits + keyspace_misses
-    hit_ratio = 0.0
-    
-    if total_requests > 0:
-      hit_ratio = (keyspace_hits / total_requests) * 100.0
-      
+    hit_ratio = (keyspace_hits / total_requests) * 100.0 if total_requests > 0 else 0.0
+
     metrics = {
             'keyspace_hits': keyspace_hits,
             'keyspace_misses': keyspace_misses,
@@ -57,7 +54,13 @@ def get_redis_cache_metrics():
     logger.info(log_message)
 
     return metrics
-    
+    # else:
+    return {
+        'keyspace_hits': 0,
+        'keyspace_misses': 0,
+        'total_requests': 0,
+        'hit_ratio': 0.0,
+    }
   except Exception as e:
     error_message = f"Error fetching Redis cache metrics: {e}"
     logger.error(error_message)
